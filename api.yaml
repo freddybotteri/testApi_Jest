@@ -1,0 +1,329 @@
+  
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Play Buzz
+  description: API for use in rtve,s CMS
+servers:
+  - url: https://www.rtve.es/playbuzz/api/v1/
+tags:
+  - name: images
+    description: endpoints for manager the images
+  - name: all
+    description: endpoints for manager the content type
+    
+paths:
+  /image/upload/:
+    post:
+      security: 
+        - basicAuth : [] 
+      tags:
+      - images
+      description: |
+        Endpoint for save image in server.
+      operationId: saveImage
+      requestBody:
+        description: Post to add image to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataImage'
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseImage'
+        '401':
+           $ref: '#/components/responses/UnauthorizedError'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /image/update/{imageId}:    
+    put:
+      security: 
+          - basicAuth : [] 
+      tags:
+      - images
+      description: Update a image in the store. Duplicates are not allowed
+      operationId: addImage
+      parameters:
+        - in: path
+          name: imageId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the image to put
+          examples:
+            one:
+              value: 1
+            two:
+              value: 2
+      requestBody:
+        description: Image to add to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataImage'
+      responses:
+        '200':
+          description: image response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        '401':
+           $ref: '#/components/responses/UnauthorizedError'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /image/delete/{imageId}:
+    delete:
+      security: 
+        - basicAuth : [] 
+      tags:
+        - images
+      description: deletes a single image based on the ID supplied
+      operationId: deleteImage
+      parameters:
+        - name: imageId
+          in: path
+          description: ID of image to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+          examples:
+            one:
+              value: 1
+            two:
+              value: 2
+      responses:
+        '204':
+          description: image deleted
+        '401':
+           $ref: '#/components/responses/UnauthorizedError'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /all/{contentType}:
+    get:
+      tags:
+        - all
+      parameters:
+        - in: path
+          name: contentType
+          required: true
+          schema:
+            type: integer
+          examples:
+            one:
+              value: 1
+            two:
+              value: 2
+      responses:
+        '200':
+          description: ContentType response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContentType'
+        '401':
+           $ref: '#/components/responses/UnauthorizedError'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /all/{contentType}/asc:
+    get:
+      tags:
+        - all
+      parameters:
+        - in: path
+          name: contentType
+          required: true
+          schema:
+            type: integer
+          examples:
+            one:
+              value: 1
+            two:
+              value: 2
+      responses:
+        '200':
+          description: ContentType asc response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContentType'
+        '401':
+           $ref: '#/components/responses/UnauthorizedError'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /all/{contentType}/asc/1/10:
+    get:
+      tags:
+        - all
+      parameters:
+        - in: path
+          name: contentType
+          required: true
+          schema:
+            type: integer
+          examples:
+            one:
+              value: 1
+            two:
+              value: 2
+      responses:
+        '200':
+          description: ContentType asc 10 lines to response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContentType'
+        '401':
+           $ref: '#/components/responses/UnauthorizedError'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /all/{contentType}/desc/1/10:
+    get:
+      tags:
+        - all
+      parameters:
+        - in: path
+          name: contentType
+          required: true
+          schema:
+            type: integer
+          examples:
+            one:
+              value: 1
+            two:
+              value: 2
+      responses:
+        '200':
+          description: ContentType desc 10 lines to response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContentType'
+        '401':
+           $ref: '#/components/responses/UnauthorizedError'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+components:
+  
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+          
+  schemas:
+    Image:
+      allOf:
+        - $ref: '#/components/schemas/DataImage'
+        - type: object
+          required:
+          - id
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    DataImage:
+      type: object
+      required:
+        - name  
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+      example:
+        name: 'xxxxxxxxxxxx'
+        location: '/url/in_server/'
+    
+    ResponseImage:
+      type: object
+      required:
+        - id  
+      properties:
+        id:
+          type: integer
+      example:
+        id: 1
+    
+    
+    ResponseContentType:
+      type: object
+      required:
+        - id  
+      properties:
+        id:
+          type: integer
+      example:
+        id: 1
+    
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+          
+          
+
+  responses:
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+            
+          
+security:
+  - basicAuth: [] 
+  
+  
+  
+          
